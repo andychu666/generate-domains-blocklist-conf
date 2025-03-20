@@ -176,7 +176,7 @@ Each markdown file includes:
 
 Structured JSON files containing the same data as the markdown files, useful for programmatic processing or integration with other tools.
 
-### `domains-blocklists.conf`
+### `domains-blocklist.conf`
 The main output file compatible with DNSCrypt-Proxy's domain blocking feature. This file:
 - Groups blocklists by category and source
 - Includes entry counts and descriptions where available
@@ -211,12 +211,12 @@ python fetch_blocklists_firebog.py
 ```bash
 python generate_domains_blocklist_conf.py
 ```
-This will create `domains-blocklists.conf` with all blocklists properly formatted, categorized, and deduplicated.
+This will create `domains-blocklist.conf` with all blocklists properly formatted, categorized, and deduplicated.
 
 5. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
 ```bash
 python /path/to/dnscrypt-proxy/utils/generate-domains-blocklist/generate-domains-blocklist.py \
-    domains-blocklists.conf > blocklist.txt
+    domains-blocklist.conf > blocklist.txt
 ```
 
 ## Integration with DNSCrypt-Proxy
@@ -248,7 +248,7 @@ Generated files (not tracked by git):
 - `blocklists_*.md`: Markdown files containing blocklist data
 - `blocklists_*.json`: JSON files containing structured blocklist data
 - `debug_screenshot_*.png`: Debug screenshots from fetching process
-- `domains-blocklists.conf`: Generated DNSCrypt-Proxy configuration
+- `domains-blocklist.conf`: Generated DNSCrypt-Proxy configuration
 
 ## License
 

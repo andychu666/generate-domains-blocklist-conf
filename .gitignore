@@ -22,8 +22,8 @@ __pycache__/
 debug_screenshot_*.png
 blocklists_*.md
 blocklists_*.json
-domains-blocklists.conf
+domains-blocklist.conf
 
 # Keep README
 !README.md
-# Generated files\ndebug_screenshot_*.png\nblocklists_*.md\nblocklists_*.json\ndomains-blocklists.conf\n\n# Keep README\n!README.md
+# Generated files\ndebug_screenshot_*.png\nblocklists_*.md\nblocklists_*.json\ndomains-blocklist.conf\n\n# Keep README\n!README.md
