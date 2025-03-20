@@ -95,28 +95,27 @@ The tool organizes blocklists from different sources into their respective categ
 
 ### ShadowWhisperer Categories
 
-#### ParentalControl
-- Adult
-- Dating
-- Gambling
-- Gaming
-- Piracy
-- Porn
-- Social
-
-#### Privacy
-- Amazon
-- Apple
-- Google
-- Microsoft
-- Smart TV
-- Tracking
-
-#### Security
-- Malware
-- Phishing
-- Ransomware
-- Scam
+- Ads: Advertisements, Banners, Widgets & Push Notifications
+- Adult: Porn / 18+ Content
+- Apple: Bloat
+- Bloat: Fonts, Surveys, Domains not required for software to function
+- Chat: Chat Dialog Popups
+- Cryptocurrency: Bitcoin, Ethereum, Mining, etc. (Not malware, but could be used by it)
+- Dating: Dating Sites
+- Dynamic: Dynamic DNS (DNS → IP)
+- Free: Free/Cheap Hosting, Free Blogs
+- Gambling: Casino, Gambling, Poker sites
+- Junk: Personally Untrusted Antivirus, Browser Extensions, Search Engines, etc.
+- Malware: Malicious Sites, PUPs, Malware, Browser Hijackers, Phishing Sites
+- Marketing: Marketing, Ebay Listing Tools, etc.
+- Microsoft: Apps, Bing, Bloat, Tiles, etc.
+- Remote: Domains used for remote sessions
+- Risk: Bad ISP/Bots/Spam, Keyloggers, Sites used by compromised devices
+- Scam: Fake freight, gift cards, products, support, pet sales, firearms, news, etc.
+- Shock: Gore, Gross, and Torture sites
+- Tracking: Analytics, Diagnostics, Location, Metrics, Public IP
+- Tunnels: VPNs & Proxies
+- URL Shortener: URL Shorteners (Can be used to mask malicious domains)
 
 ### The Firebog Categories
 
