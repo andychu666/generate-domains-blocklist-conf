@@ -244,7 +244,6 @@ generate-domains-blocklist-conf/
 ├── LICENSE                          # ISC License
 ├── README.md                        # This documentation
 ├── requirements.txt                 # Python dependencies
-├── example-domains-blocklist.conf   # Example configuration file
 ├── fetch_blocklists_rethinkdns.py  # RethinkDNS blocklist fetcher
 ├── fetch_blocklists_shadowwhisperer.py # ShadowWhisperer blocklist fetcher
 ├── fetch_blocklists_firebog.py     # The Firebog blocklist fetcher
