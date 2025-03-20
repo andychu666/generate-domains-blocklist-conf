@@ -130,9 +130,10 @@ async def main():
             json.dump(categories, f, indent=2, ensure_ascii=False)
         print("Successfully saved blocklists to blocklists_rethinkdns.json")
         
-        await page.screenshot(path='debug_screenshot.png')
-        print("Saved debug screenshot to debug_screenshot.png")
+        await page.screenshot(path='debug_screenshot_rethinkdns.png')
+        print("Saved debug screenshot to debug_screenshot_rethinkdns.png")
         
         await browser.close()
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

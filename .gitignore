@@ -10,6 +10,7 @@ __pycache__/
 
 # Debug files
 debug_screenshot.png
+debug_screenshot_*.png
 
 # IDE
 .vscode/
@@ -24,8 +25,8 @@ debug_screenshot.png
 
 # Generated files
 domains-blocklists.conf
-blocklists_rethinkdns.md
-*.json
+blocklists_*.md
+blocklists_*.json
 
 # Keep README
 !README.md

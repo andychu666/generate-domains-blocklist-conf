@@ -24,24 +24,34 @@ def parse_markdown_file(md_file):
     
     return urls
 
-def generate_conf_file(urls, output_file):
+def generate_conf_file(urls_rethink, urls_shadow, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
         # Write header
         f.write('##################################################################################\n')
         f.write('#                                                                                #\n')
-        f.write('#   RethinkDNS Blocklists Configuration                                         #\n')
-        f.write('#   Generated from RethinkDNS blocklists data                                   #\n')
+        f.write('#   Combined Blocklists Configuration                                            #\n')
+        f.write('#   Generated from RethinkDNS and ShadowWhisperer blocklists                    #\n')
         f.write('#                                                                                #\n')
         f.write('#   URLs are organized by category and commented if duplicate                    #\n')
         f.write('#   Format: Category - Name (Entries count)                                     #\n')
         f.write('#                                                                                #\n')
         f.write('##################################################################################\n\n')
         
+        # Combine all URLs
+        all_urls = defaultdict(list)
+        for url, entries in urls_rethink.items():
+            for entry in entries:
+                all_urls[url].append(('RethinkDNS: ' + entry[0], entry[1], entry[2]))
+        
+        for url, entries in urls_shadow.items():
+            for entry in entries:
+                all_urls[url].append(('ShadowWhisperer: ' + entry[0], entry[1], entry[2]))
+        
         # Track categories for section headers
         current_category = None
         
         # Sort URLs by category
-        sorted_urls = sorted(urls.items(), key=lambda x: (x[1][0][0], x[1][0][1]))  # Sort by category, then name
+        sorted_urls = sorted(all_urls.items(), key=lambda x: (x[1][0][0], x[1][0][1]))  # Sort by category, then name
         
         for url, entries in sorted_urls:
             category, name, entry_count = entries[0]  # Take first occurrence for category header
@@ -61,17 +71,27 @@ def generate_conf_file(urls, output_file):
                 f.write(f'{url}\n\n')
 
 def main():
-    # Read the markdown file
+    # Read both markdown files
     try:
-        with open('blocklists_rethinkdns.md', 'r', encoding='utf-8') as f:
-            markdown_content = f.read()
+        urls_rethink = parse_markdown_file('blocklists_rethinkdns.md')
+        print("Successfully parsed RethinkDNS blocklists")
     except FileNotFoundError:
-        print("Error: blocklists_rethinkdns.md not found")
+        print("Warning: blocklists_rethinkdns.md not found")
+        urls_rethink = {}
+
+    try:
+        urls_shadow = parse_markdown_file('blocklists_shadowwhisperer.md')
+        print("Successfully parsed ShadowWhisperer blocklists")
+    except FileNotFoundError:
+        print("Warning: blocklists_shadowwhisperer.md not found")
+        urls_shadow = {}
+
+    if not urls_rethink and not urls_shadow:
+        print("Error: No blocklist files found")
         return
 
-    urls = parse_markdown_file('blocklists_rethinkdns.md')
-    generate_conf_file(urls, 'domains-blocklists.conf')
-    print("Successfully converted markdown to conf format!")
+    generate_conf_file(urls_rethink, urls_shadow, 'domains-blocklists.conf')
+    print("Successfully generated combined conf file!")
 
 if __name__ == "__main__":
     main() 

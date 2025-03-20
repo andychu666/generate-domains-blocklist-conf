@@ -1,11 +1,13 @@
-# RethinkDNS to DNSCrypt-Proxy Blocklist Generator
+# DNSCrypt-Proxy Blocklist Generator
 
-A utility to generate DNSCrypt-Proxy compatible domain blocklists using categorized data from RethinkDNS's public configuration.
+A utility to generate DNSCrypt-Proxy compatible domain blocklists using categorized data from multiple sources:
+- RethinkDNS's public configuration
+- ShadowWhisperer's BlockLists
 
 ## Overview
 
 This tool helps you create organized blocklist configurations for DNSCrypt-Proxy by:
-1. Fetching categorized blocklist data from RethinkDNS's public configuration
+1. Fetching categorized blocklist data from multiple sources
 2. Converting the data into DNSCrypt-Proxy's blocklist format
 3. Generating organized configuration files for different categories (Privacy, Security, ParentalControl)
 
@@ -19,7 +21,7 @@ This tool helps you create organized blocklist configurations for DNSCrypt-Proxy
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/YOUR_USERNAME/generate-domains-blocklist-conf.git
+git clone https://github.com/andychu666/generate-domains-blocklist-conf.git
 cd generate-domains-blocklist-conf
 ```
 
@@ -46,10 +48,11 @@ playwright install chromium
 
 ## Data Sources
 
-This tool fetches blocklist from:
-- RethinkDNS Configure Page (https://rethinkdns.com/configure)
+This tool fetches blocklist configurations from:
+1. RethinkDNS Configure Page (https://rethinkdns.com/configure)
+2. ShadowWhisperer's BlockLists (https://github.com/ShadowWhisperer/BlockLists)
 
-**Note**: This project is not affiliated with or endorsed by RethinkDNS. It simply converts their publicly available blocklist into DNSCrypt-Proxy compatible format.
+**Note**: This project is not affiliated with or endorsed by RethinkDNS or ShadowWhisperer. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
 
 ## Categories
 
@@ -61,17 +64,25 @@ The tool organizes blocklists into the following main categories:
 - Gambling
 - Dating
 - Social Media
+- Chat platforms
 
 ### Security
 - Malware
 - Ransomware
 - Phishing
+- Cryptocurrency
+- Scams
+- Dynamic DNS
+- URL Shorteners
 - Other threats
 
 ### Privacy
 - Adware
 - Spyware
 - Trackers
+- Marketing
+- Microsoft telemetry
+- Apple telemetry
 
 ## Output Files
 
@@ -99,22 +110,31 @@ A screenshot of the RethinkDNS configuration page taken during the fetch process
 
 ## Usage
 
-1. Run the fetch script to get blocklists from RethinkDNS:
+1. Run the RethinkDNS fetch script:
 ```bash
 python fetch_blocklists_rethinkdns.py
 ```
-This will generate three files:
-- `blocklists_rethinkdns.md`: A human-readable markdown file with all blocklists
-- `blocklists_rethinkdns.json`: A structured JSON file containing the blocklist data
+This will generate:
+- `blocklists_rethinkdns.md`: A human-readable markdown file with RethinkDNS blocklists
+- `blocklists_rethinkdns.json`: A structured JSON file containing the RethinkDNS data
 - `debug_screenshot.png`: A screenshot of the RethinkDNS page for debugging
 
-2. Generate the DNSCrypt-Proxy configuration:
+2. Run the ShadowWhisperer fetch script:
+```bash
+python fetch_blocklists_ShadowWhisperer.py
+```
+This will generate:
+- `blocklists_shadowwhisperer.md`: A human-readable markdown file with ShadowWhisperer blocklists
+- `blocklists_shadowwhisperer.json`: A structured JSON file containing the ShadowWhisperer data
+- `debug_screenshot_shadowwhisperer.png`: A debug screenshot
+
+3. Generate the combined DNSCrypt-Proxy configuration:
 ```bash
 python generate_domains_blocklist_conf.py
 ```
-This will create `domains-blocklists.conf` with all blocklists properly formatted and categorized.
+This will create `domains-blocklists.conf` with all blocklists properly formatted, categorized, and deduplicated.
 
-3. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
+4. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
 ```bash
 python /path/to/dnscrypt-proxy/utils/generate-domains-blocklist/generate-domains-blocklist.py \
     domains-blocklists.conf > blocklist.txt
@@ -137,12 +157,16 @@ generate-domains-blocklist-conf/
 ├── LICENSE                          # ISC License
 ├── README.md                        # This file
 ├── requirements.txt                 # Python dependencies
-├── fetch_blocklists_rethinkdns.py  # Script to fetch blocklists from RethinkDNS
+├── fetch_blocklists_rethinkdns.py  # Script to fetch RethinkDNS blocklists
+├── fetch_blocklists_ShadowWhisperer.py # Script to fetch ShadowWhisperer blocklists
 ├── generate_domains_blocklist_conf.py # Script to generate DNSCrypt-Proxy config
-├── blocklists_rethinkdns.md        # Generated markdown file with blocklists
-├── blocklists_rethinkdns.json      # Generated JSON file with blocklist data
+├── blocklists_rethinkdns.md        # Generated markdown file with RethinkDNS lists
+├── blocklists_shadowwhisperer.md   # Generated markdown file with ShadowWhisperer lists
+├── blocklists_rethinkdns.json      # Generated JSON file with RethinkDNS data
+├── blocklists_shadowwhisperer.json # Generated JSON file with ShadowWhisperer data
 ├── domains-blocklists.conf         # Generated DNSCrypt-Proxy configuration
 ├── debug_screenshot.png            # Debug screenshot from RethinkDNS page
+├── debug_screenshot_shadowwhisperer.png # Debug screenshot from ShadowWhisperer
 └── .venv/                          # Python virtual environment (generated)
 ```
 
@@ -153,4 +177,5 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [DNSCrypt-Proxy](https://github.com/DNSCrypt/dnscrypt-proxy) - For the domain blocking functionality
-- [RethinkDNS](https://rethinkdns.com/configure) - Source of blocklist categorization data 
+- [RethinkDNS](https://rethinkdns.com/configure) - Source of blocklist categorization data
+- [ShadowWhisperer's BlockLists](https://github.com/ShadowWhisperer/BlockLists) - Additional blocklist source 
