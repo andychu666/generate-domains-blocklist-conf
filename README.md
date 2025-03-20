@@ -177,11 +177,18 @@ Each markdown file includes:
 Structured JSON files containing the same data as the markdown files, useful for programmatic processing or integration with other tools.
 
 ### `domains-blocklist.conf`
-The main output file compatible with DNSCrypt-Proxy's domain blocking feature. This file:
-- Groups blocklists by category and source
-- Includes entry counts and descriptions where available
-- Marks duplicate entries across categories and sources
-- Uses proper formatting for DNSCrypt-Proxy compatibility
+The configuration file that lists URLs of blocklist sources for DNSCrypt-Proxy's `generate-domains-blocklist.py` utility. This file:
+- Lists URLs of blocklist sources, one per line
+- Supports file:// URLs for local additions
+- Allows commenting out sources with # to disable them
+- Follows DNSCrypt-Proxy's standard configuration format
+- Used by `generate-domains-blocklist.py` to create an optimized and deduplicated domain blocklist
+
+The generated configuration can be used with DNSCrypt-Proxy's `generate-domains-blocklist.py` to create a final blocklist that:
+- Removes duplicates across all sources
+- Handles overlapping patterns
+- Respects the allowlist (domains-allowlist.txt)
+- Supports time-restricted blocks
 
 ### Debug Screenshots
 - `debug_screenshot_rethinkdns.png`
