@@ -1,0 +1,31 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Debug files
+debug_screenshot.png
+
+# IDE
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*~
+
+# Logs
+*.log 
+
+# Generated files
+domains-blocklists.conf
+blocklists_rethinkdns.md
+*.json
+
+# Keep README
+!README.md
