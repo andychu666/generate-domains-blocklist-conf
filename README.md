@@ -154,21 +154,21 @@ For more information about DNSCrypt-Proxy's domain blocking feature, see:
 ```
 generate-domains-blocklist-conf/
 ├── .gitattributes                   # Git attributes for line ending handling
+├── .gitignore                       # Git ignore patterns
 ├── LICENSE                          # ISC License
-├── README.md                        # This file
+├── README.md                        # This documentation
 ├── requirements.txt                 # Python dependencies
-├── fetch_blocklists_rethinkdns.py  # Script to fetch RethinkDNS blocklists
-├── fetch_blocklists_ShadowWhisperer.py # Script to fetch ShadowWhisperer blocklists
-├── generate_domains_blocklist_conf.py # Script to generate DNSCrypt-Proxy config
-├── blocklists_rethinkdns.md        # Generated markdown file with RethinkDNS lists
-├── blocklists_shadowwhisperer.md   # Generated markdown file with ShadowWhisperer lists
-├── blocklists_rethinkdns.json      # Generated JSON file with RethinkDNS data
-├── blocklists_shadowwhisperer.json # Generated JSON file with ShadowWhisperer data
-├── domains-blocklists.conf         # Generated DNSCrypt-Proxy configuration
-├── debug_screenshot.png            # Debug screenshot from RethinkDNS page
-├── debug_screenshot_shadowwhisperer.png # Debug screenshot from ShadowWhisperer
-└── .venv/                          # Python virtual environment (generated)
+├── example-domains-blocklist.conf   # Example configuration file
+├── fetch_blocklists_rethinkdns.py  # RethinkDNS blocklist fetcher
+├── fetch_blocklists_ShadowWhisperer.py # ShadowWhisperer blocklist fetcher
+└── generate_domains_blocklist_conf.py  # Configuration generator
 ```
+
+Generated files (not tracked by git):
+- `blocklists_*.md`: Markdown files containing blocklist data
+- `blocklists_*.json`: JSON files containing structured blocklist data
+- `debug_screenshot_*.png`: Debug screenshots from fetching process
+- `domains-blocklists.conf`: Generated DNSCrypt-Proxy configuration
 
 ## License
 

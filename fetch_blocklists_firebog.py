@@ -46,7 +46,14 @@ async def main():
                         links.forEach(link => {
                             const name = link.textContent.trim();
                             const url = link.href;
-                            if (url && !url.includes('javascript:')) {
+                            // Only include raw URLs that can be used as blocklists
+                            if (url && !url.includes('javascript:') && 
+                                (url.includes('raw.githubusercontent.com') || 
+                                 url.includes('v.firebog.net') ||
+                                 url.includes('hosts.txt') ||
+                                 url.includes('list.txt') ||
+                                 url.includes('blocklist.txt') ||
+                                 url.endsWith('.txt'))) {
                                 results[category].push({
                                     name: name,
                                     url: url
