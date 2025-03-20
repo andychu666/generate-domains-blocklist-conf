@@ -4,6 +4,7 @@ A utility to generate DNSCrypt-Proxy compatible domain blocklists using categori
 - RethinkDNS's public configuration
 - ShadowWhisperer's BlockLists
 - The Firebog's curated blocklists
+- Geoffrey Frogeye's First-party Trackers
 
 ## Overview
 
@@ -53,8 +54,9 @@ This tool fetches blocklist configurations from:
 1. RethinkDNS Configure Page (https://rethinkdns.com/configure)
 2. ShadowWhisperer's BlockLists (https://github.com/ShadowWhisperer/BlockLists)
 3. The Firebog's Curated Lists (https://firebog.net/)
+4. Geoffrey Frogeye's First-party Trackers (https://hostfiles.frogeye.fr/)
 
-**Note**: This project is not affiliated with or endorsed by RethinkDNS, ShadowWhisperer, or The Firebog. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
+**Note**: This project is not affiliated with or endorsed by RethinkDNS, ShadowWhisperer, The Firebog, or Geoffrey Frogeye. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
 
 ## Categories
 
@@ -154,6 +156,29 @@ The tool organizes blocklists from different sources into their respective categ
 - Facebook
 - Custom filters
 
+### Geoffrey Frogeye Categories
+
+#### First-party Trackers
+- Contains every hostname redirecting to a hand-picked list of first-party trackers
+- Safe from false-positives
+- Includes company domains for comprehensive blocking
+
+#### First-party Only
+- Same as First-party Trackers but without company domains
+- Optimized for browser extensions like uBlock Origin
+- Focused on specific tracking endpoints
+
+#### Multi-party Trackers
+- Contains hostnames redirecting to trackers from existing lists
+- Sources include EasyPrivacy and AdGuard
+- May have some false positives
+- Includes company domains
+
+#### Multi-party Only
+- Same as Multi-party Trackers but without company domains
+- Designed for use with other blocklists in regex-mode
+- Focused on specific tracking endpoints
+
 ## Output Files
 
 The tool generates several output files:
@@ -162,6 +187,7 @@ The tool generates several output files:
 - `blocklists_rethinkdns.md`: RethinkDNS blocklists organized by category
 - `blocklists_shadowwhisperer.md`: ShadowWhisperer blocklists organized by category
 - `blocklists_firebog.md`: The Firebog's curated blocklists organized by category
+- `blocklists_frogeye.md`: Geoffrey Frogeye's tracker blocklists organized by category
 
 Each markdown file includes:
 - Category and subcategory
@@ -173,6 +199,7 @@ Each markdown file includes:
 - `blocklists_rethinkdns.json`
 - `blocklists_shadowwhisperer.json`
 - `blocklists_firebog.json`
+- `blocklists_frogeye.json`
 
 Structured JSON files containing the same data as the markdown files, useful for programmatic processing or integration with other tools.
 
@@ -214,13 +241,18 @@ python fetch_blocklists_shadowwhisperer.py
 python fetch_blocklists_firebog.py
 ```
 
-4. Generate the combined DNSCrypt-Proxy configuration:
+4. Run the Frogeye fetch script:
+```bash
+python fetch_blocklists_frogeye.py
+```
+
+5. Generate the combined DNSCrypt-Proxy configuration:
 ```bash
 python generate_domains_blocklist_conf.py
 ```
 This will create `domains-blocklist.conf` with all blocklists properly formatted, categorized, and deduplicated.
 
-5. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
+6. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
 ```bash
 python /path/to/dnscrypt-proxy/utils/generate-domains-blocklist/generate-domains-blocklist.py \
     domains-blocklist.conf > blocklist.txt
@@ -247,6 +279,7 @@ generate-domains-blocklist-conf/
 ├── fetch_blocklists_rethinkdns.py  # RethinkDNS blocklist fetcher
 ├── fetch_blocklists_shadowwhisperer.py # ShadowWhisperer blocklist fetcher
 ├── fetch_blocklists_firebog.py     # The Firebog blocklist fetcher
+├── fetch_blocklists_frogeye.py     # Geoffrey Frogeye's blocklist fetcher
 └── generate_domains_blocklist_conf.py  # Configuration generator
 ```
 
@@ -266,3 +299,4 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - [RethinkDNS](https://rethinkdns.com/configure) - Source of blocklist categorization data
 - [ShadowWhisperer's BlockLists](https://github.com/ShadowWhisperer/BlockLists) - Additional blocklist source
 - [The Firebog](https://firebog.net/) - Curated collection of blocklists 
+- [Geoffrey Frogeye](https://hostfiles.frogeye.fr/) - Source of first-party tracker blocklists 
