@@ -58,17 +58,22 @@ This tool fetches blocklist configurations from:
 
 ## Categories
 
-The tool organizes blocklists into the following main categories:
+The tool organizes blocklists from different sources into their respective categories:
 
-### Parental Controls
+### RethinkDNS Categories
+
+#### Parental Controls
 - Adult content
 - Piracy
 - Gambling
 - Dating
 - Social Media
 - Chat platforms
+- Gaming
+- Streaming Media
+- File Sharing
 
-### Security
+#### Security
 - Malware
 - Ransomware
 - Phishing
@@ -78,20 +83,77 @@ The tool organizes blocklists into the following main categories:
 - URL Shorteners
 - Other threats
 
-### Privacy
+#### Privacy
 - Adware
 - Spyware
 - Trackers
 - Marketing
 - Microsoft telemetry
 - Apple telemetry
+- Google telemetry
+- Smart TV telemetry
 
-### Additional Categories from The Firebog
-- Suspicious
-- Advertising
-- Tracking & Telemetry
-- Malicious
-- Other
+### ShadowWhisperer Categories
+
+#### ParentalControl
+- Adult
+- Dating
+- Gambling
+- Gaming
+- Piracy
+- Porn
+- Social
+
+#### Privacy
+- Amazon
+- Apple
+- Google
+- Microsoft
+- Smart TV
+- Tracking
+
+#### Security
+- Malware
+- Phishing
+- Ransomware
+- Scam
+
+### The Firebog Categories
+
+#### Suspicious
+- KADhosts
+- Spammers
+- Blacklists
+- Referrer Spam
+- Other suspicious domains
+
+#### Advertising
+- AdAway
+- Adguard DNS
+- Anti-Adblock
+- Easylist
+- Peter Lowe's Adservers
+- Other ad domains
+
+#### Tracking & Telemetry
+- Easyprivacy
+- Windows Spyware
+- Smart TV tracking
+- Multi-party trackers
+- Analytics domains
+
+#### Malicious
+- Cryptojacking
+- Malware domains
+- Phishing Army
+- Ransomware
+- Scam domains
+- Stalkerware
+
+#### Other
+- Adult content
+- Facebook
+- Custom filters
 
 ## Output Files
 
