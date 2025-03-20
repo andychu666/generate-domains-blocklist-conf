@@ -24,13 +24,13 @@ def parse_markdown_file(md_file):
     
     return urls
 
-def generate_conf_file(urls_rethink, urls_shadow, output_file):
+def generate_conf_file(urls_rethink, urls_shadow, urls_firebog, output_file):
     with open(output_file, 'w', encoding='utf-8') as f:
         # Write header
         f.write('##################################################################################\n')
         f.write('#                                                                                #\n')
         f.write('#   Combined Blocklists Configuration                                            #\n')
-        f.write('#   Generated from RethinkDNS and ShadowWhisperer blocklists                    #\n')
+        f.write('#   Generated from RethinkDNS, ShadowWhisperer, and Firebog blocklists         #\n')
         f.write('#                                                                                #\n')
         f.write('#   URLs are organized by category and commented if duplicate                    #\n')
         f.write('#   Format: Category - Name (Entries count)                                     #\n')
@@ -39,13 +39,25 @@ def generate_conf_file(urls_rethink, urls_shadow, output_file):
         
         # Combine all URLs
         all_urls = defaultdict(list)
+        seen_urls = set()  # Track URLs to handle duplicates
+        
+        # Add RethinkDNS URLs first
         for url, entries in urls_rethink.items():
             for entry in entries:
                 all_urls[url].append(('RethinkDNS: ' + entry[0], entry[1], entry[2]))
+                seen_urls.add(url)
         
+        # Add ShadowWhisperer URLs
         for url, entries in urls_shadow.items():
             for entry in entries:
                 all_urls[url].append(('ShadowWhisperer: ' + entry[0], entry[1], entry[2]))
+                seen_urls.add(url)
+        
+        # Add Firebog URLs
+        for url, entries in urls_firebog.items():
+            for entry in entries:
+                all_urls[url].append(('Firebog: ' + entry[0], entry[1], entry[2]))
+                seen_urls.add(url)
         
         # Track categories for section headers
         current_category = None
@@ -67,11 +79,12 @@ def generate_conf_file(urls_rethink, urls_shadow, output_file):
                 f.write(f'# DUPLICATE in: {categories_str}\n')
                 f.write(f'# {url}\n\n')
             else:
-                f.write(f'# {name} ({entry_count})\n')
+                entry_info = f' ({entry_count})' if entry_count else ''
+                f.write(f'# {name}{entry_info}\n')
                 f.write(f'{url}\n\n')
 
 def main():
-    # Read both markdown files
+    # Read all markdown files
     try:
         urls_rethink = parse_markdown_file('blocklists_rethinkdns.md')
         print("Successfully parsed RethinkDNS blocklists")
@@ -86,11 +99,18 @@ def main():
         print("Warning: blocklists_shadowwhisperer.md not found")
         urls_shadow = {}
 
-    if not urls_rethink and not urls_shadow:
+    try:
+        urls_firebog = parse_markdown_file('blocklists_firebog.md')
+        print("Successfully parsed Firebog blocklists")
+    except FileNotFoundError:
+        print("Warning: blocklists_firebog.md not found")
+        urls_firebog = {}
+
+    if not urls_rethink and not urls_shadow and not urls_firebog:
         print("Error: No blocklist files found")
         return
 
-    generate_conf_file(urls_rethink, urls_shadow, 'domains-blocklists.conf')
+    generate_conf_file(urls_rethink, urls_shadow, urls_firebog, 'domains-blocklists.conf')
     print("Successfully generated combined conf file!")
 
 if __name__ == "__main__":
