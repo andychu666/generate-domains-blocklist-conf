@@ -252,6 +252,20 @@ The tool organizes blocklists from different sources into their respective categ
 - Designed for use with other blocklists in regex-mode
 - Focused on specific tracking endpoints
 
+### NextDNS Categories (Recommended)
+- Ads & Trackers Blocklists
+- Privacy Blocklists
+- Security Blocklists
+- Adult Content Filters
+- Regional Blocklists
+- Custom Blocklists
+
+### Yokoffing Categories (Curated)
+- Annoyances
+- Privacy Protection
+- Adult Content
+- Custom Filters
+
 ## Project Structure
 
 ```
@@ -265,6 +279,8 @@ generate-domains-blocklist-conf/
 ├── fetch_blocklists_shadowwhisperer.py # ShadowWhisperer blocklist fetcher
 ├── fetch_blocklists_firebog.py     # The Firebog blocklist fetcher
 ├── fetch_blocklists_frogeye.py     # Geoffrey Frogeye's blocklist fetcher
+├── fetch_blocklists_nextdns.py     # NextDNS blocklist fetcher
+├── fetch_blocklists_yokoffing.py   # Yokoffing blocklist fetcher
 └── generate_domains_blocklist_conf.py  # Configuration generator
 ```
 
@@ -285,5 +301,9 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - [ShadowWhisperer's BlockLists](https://github.com/ShadowWhisperer/BlockLists) - Additional blocklist source
 - [The Firebog](https://firebog.net/) - Curated collection of blocklists 
 - [Geoffrey Frogeye](https://hostfiles.frogeye.fr/) - Source of first-party tracker blocklists 
+- [NextDNS](https://github.com/nextdns/blocklists) - Recommended high-quality blocklists
+- [Yokoffing](https://github.com/yokoffing/filterlists) - Curated annoyance and privacy lists
 
-<div align='center'>21 March 2024</div> 
+21 March 2024 
+
+<p align="center">21 March 2024</p> 
