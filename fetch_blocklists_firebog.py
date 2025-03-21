@@ -59,7 +59,7 @@ async def save_debug_info(page, name: str) -> None:
 
 async def scrape_blocklists(page) -> Dict[str, List[Dict[str, str]]]:
     """
-    Scrape blocklist data from the page.
+    Scrape blocklist data from the page, only keeping v.firebog.net hosted lists.
     
     Args:
         page: Playwright page object
@@ -87,15 +87,17 @@ async def scrape_blocklists(page) -> Dict[str, List[Dict[str, str]]]:
                 if (ul) {
                     const links = ul.querySelectorAll('a');
                     links.forEach(link => {
-                        const name = link.textContent.trim();
                         const url = link.href;
-                        if (url && !url.includes('javascript:') && 
-                            (url.includes('raw.githubusercontent.com') || 
-                             url.includes('v.firebog.net') ||
-                             url.includes('hosts.txt') ||
-                             url.includes('list.txt') ||
-                             url.includes('blocklist.txt') ||
-                             url.endsWith('.txt'))) {
+                        // Only include URLs from v.firebog.net
+                        if (url && url.includes('v.firebog.net')) {
+                            // Extract a clean name from the URL
+                            let name = url.split("/").pop();  // Get the last part of the URL
+                            if (name.endsWith(".txt")) {
+                                name = name.slice(0, -4);  // Remove .txt extension
+                            }
+                            name = name.replace(/([A-Z])/g, ' $1').trim();  // Add spaces before capitals
+                            name = name.charAt(0).toUpperCase() + name.slice(1);  // Capitalize first letter
+                            
                             results[category].push({
                                 name: name,
                                 url: url
@@ -110,7 +112,7 @@ async def scrape_blocklists(page) -> Dict[str, List[Dict[str, str]]]:
     ''')
     
     total_lists = sum(len(items) for items in raw_data.values())
-    log_message(f"Found {len(raw_data)} categories with {total_lists} total blocklists")
+    log_message(f"Found {len(raw_data)} categories with {total_lists} total v.firebog.net blocklists")
     for category, items in raw_data.items():
         log_message(f"  - {category}: {len(items)} blocklists")
     
@@ -118,11 +120,11 @@ async def scrape_blocklists(page) -> Dict[str, List[Dict[str, str]]]:
 
 async def main():
     """Main function to fetch and process The Firebog's blocklists."""
-    log_message("\n=== Starting Firebog Blocklist Fetcher ===\n")
+    log_message("\n=== Starting Firebog Blocklist Fetcher (v.firebog.net only) ===\n")
     log_message("Initializing browser...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
-            headless=False,
+            headless=True,
             args=['--disable-web-security', '--no-sandbox']
         )
         context = await browser.new_context(
@@ -149,25 +151,26 @@ async def main():
         blocklist_data = {
             "categories": {
                 category: {
-                    "description": f"Blocklists from The Firebog's {category} category",
+                    "description": f"Curated blocklists from The Firebog's {category} category (v.firebog.net)",
                     "blocklists": [
                         {
                             "name": item["name"],
                             "url": item["url"],
                             "entries": 0,
-                            "source": "The Firebog"
+                            "source": "The Firebog (v.firebog.net)"
                         }
                         for item in items
                     ]
                 }
                 for category, items in raw_data.items()
+                if items  # Only include categories that have blocklists
             }
         }
         
         # Generate markdown content
         log_message("\nGenerating markdown content...")
-        markdown_content = "# The Firebog Blocklists\n\n"
-        markdown_content += "This document contains a comprehensive list of blocklists available through The Firebog (https://v.firebog.net/), organized by category.\n\n"
+        markdown_content = "# The Firebog Blocklists (v.firebog.net)\n\n"
+        markdown_content += "This document contains curated blocklists hosted at v.firebog.net, organized by category.\n\n"
         
         for category, data in blocklist_data["categories"].items():
             log_message(f"  - Processing {category} category")
@@ -193,7 +196,7 @@ async def main():
         log_message("  ✓ Saved JSON to blocklists_firebog.json")
         
         await browser.close()
-        log_message("\n=== Firebog Blocklist Fetcher Completed ===\n")
+        log_message("\n=== Firebog Blocklist Fetcher Completed (v.firebog.net only) ===\n")
 
 if __name__ == "__main__":
     asyncio.run(main()) 

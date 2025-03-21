@@ -1,10 +1,72 @@
-# DNSCrypt-Proxy Blocklist Generator
+# DNSCrypt-Proxy Domains Blocklist Generator
 
-A utility to generate DNSCrypt-Proxy compatible domain blocklists using categorized data from multiple sources in a prioritized order:
-1. RethinkDNS's public configuration (Primary source)
-2. The Firebog's curated v.firebog.net lists
-3. ShadowWhisperer's BlockLists (Additional lists)
-4. Geoffrey Frogeye's First-party Trackers (Specialized tracking lists)
+This project generates a comprehensive domains blocklist configuration for DNSCrypt-Proxy by combining multiple high-quality sources.
+
+## Sources (in priority order)
+
+1. **RethinkDNS** - Primary source with extensive categorization
+   - Categories: ParentalControl, Security, Privacy
+   - Source: https://rethinkdns.com/configure
+
+2. **ShadowWhisperer** - Comprehensive categorized lists
+   - Categories: Privacy, ParentalControl, Security
+   - Source: https://github.com/ShadowWhisperer/BlockLists
+
+3. **NextDNS** - Recommended blocklists
+   - Curated selection of high-quality blocklists
+   - Source: https://github.com/nextdns/blocklists
+
+4. **yokoffing** - Curated annoyance and privacy lists
+   - Categories: Annoyances, Privacy
+   - Source: https://github.com/yokoffing/filterlists
+
+5. **Geoffrey Frogeye** - Specialized tracking protection lists
+   - First-party and Multi-party trackers
+   - Source: https://hostfiles.frogeye.fr/
+
+6. **The Firebog** - Additional curated lists (v.firebog.net only)
+   - Categories: Suspicious, Advertising, Tracking & Telemetry, Malicious
+   - Source: https://v.firebog.net/
+
+## Usage
+
+1. Install dependencies:
+```powershell
+uv venv
+uv pip install -r requirements.txt
+```
+
+2. Run the fetch scripts to gather blocklists:
+```powershell
+python fetch_blocklists_rethinkdns.py
+python fetch_blocklists_shadowwhisperer.py
+python fetch_blocklists_nextdns.py
+python fetch_blocklists_yokoffing.py
+python fetch_blocklists_frogeye.py
+python fetch_blocklists_firebog.py
+```
+
+3. Generate the configuration:
+```powershell
+python generate_domains_blocklist_conf.py
+```
+
+4. Copy `domains-blocklist.conf` to your DNSCrypt-Proxy configuration directory.
+
+## Output Files
+
+- `domains-blocklist.conf`: Main configuration file for DNSCrypt-Proxy
+- `blocklists_*.json`: Intermediate files containing structured data
+- `blocklists_*.md`: Documentation for each source's blocklists
+- `debug_screenshots/`: Debug information and screenshots (gitignored)
+
+## Local Additions
+
+You can add your own domains to block by creating a file named `domains-blocklist-local-additions.txt` in your DNSCrypt-Proxy configuration directory.
+
+## License
+
+MIT License - See LICENSE file for details
 
 ## Overview
 
@@ -189,87 +251,6 @@ The tool organizes blocklists from different sources into their respective categ
 - Same as Multi-party Trackers but without company domains
 - Designed for use with other blocklists in regex-mode
 - Focused on specific tracking endpoints
-
-## Output Files
-
-The tool generates several output files:
-
-### Configuration File
-- `domains-blocklist.conf`: The main DNSCrypt-Proxy configuration file
-  - Clear section markers for each source
-  - Organized by priority and category
-  - Includes entry counts and descriptions
-  - Local additions support
-
-### Markdown Files
-- `blocklists_rethinkdns.md`: Primary source blocklists
-- `blocklists_firebog.md`: Curated v.firebog.net lists
-- `blocklists_shadowwhisperer.md`: Additional specialized lists
-- `blocklists_frogeye.md`: Tracking protection lists
-
-Each markdown file includes:
-- Category and subcategory
-- Blocklist name
-- Number of entries (where available)
-- Source URL
-
-### JSON Files
-- `blocklists_rethinkdns.json`
-- `blocklists_shadowwhisperer.json`
-- `blocklists_firebog.json`
-- `blocklists_frogeye.json`
-
-Structured JSON files containing the same data as the markdown files, useful for programmatic processing or integration with other tools.
-
-### Debug Screenshots
-- `debug_screenshot_rethinkdns.png`
-- `debug_screenshot_shadowwhisperer.png`
-- `debug_screenshot_firebog.png`
-
-Screenshots taken during the fetch process, useful for debugging or verification.
-
-## Usage
-
-1. Run the RethinkDNS fetch script:
-```bash
-python fetch_blocklists_rethinkdns.py
-```
-
-2. Run the ShadowWhisperer fetch script:
-```bash
-python fetch_blocklists_shadowwhisperer.py
-```
-
-3. Run the Firebog fetch script:
-```bash
-python fetch_blocklists_firebog.py
-```
-
-4. Run the Frogeye fetch script:
-```bash
-python fetch_blocklists_frogeye.py
-```
-
-5. Generate the combined DNSCrypt-Proxy configuration:
-```bash
-python generate_domains_blocklist_conf.py
-```
-This will create `domains-blocklist.conf` with all blocklists properly formatted, categorized, and deduplicated.
-
-6. Use the generated configuration with DNSCrypt-Proxy's `generate-domains-blocklist.py`:
-```bash
-python /path/to/dnscrypt-proxy/utils/generate-domains-blocklist/generate-domains-blocklist.py \
-    domains-blocklist.conf > blocklist.txt
-```
-
-## Integration with DNSCrypt-Proxy
-
-This tool generates configuration files compatible with DNSCrypt-Proxy's domain blocking feature. You'll need:
-1. DNSCrypt-Proxy's `generate-domains-blocklist.py` utility (from the DNSCrypt-Proxy repository)
-2. The configuration file generated by this tool
-
-For more information about DNSCrypt-Proxy's domain blocking feature, see:
-- [DNSCrypt-Proxy Documentation](https://github.com/DNSCrypt/dnscrypt-proxy)
 
 ## Project Structure
 

@@ -1,5 +1,10 @@
 playwright==1.42.0
-pyee==12.1.1
-typing-extensions==4.12.2
-greenlet==3.1.1
-requests==2.31.0 
+pyee==11.0.1
+typing-extensions==4.9.0
+greenlet==3.0.3
+requests==2.31.0
+beautifulsoup4==4.12.3
+markdown==3.5.2
+python-dateutil==2.8.2
+aiohttp==3.9.3
+urllib3==2.2.1 

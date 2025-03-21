@@ -252,6 +252,22 @@ def process_firebog_data(data: Dict[str, Any]) -> Dict[str, Any]:
         log_message(f"Error processing Firebog data: {str(e)}")
         return {"categories": {}}
 
+def process_nextdns_data(data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Process NextDNS JSON data into standardized format.
+    
+    Args:
+        data: Dictionary containing NextDNS JSON data
+        
+    Returns:
+        Dictionary with standardized blocklist data
+    """
+    if not data or "categories" not in data:
+        log_message("Warning: Invalid NextDNS data format")
+        return {"categories": {}}
+    
+    return data
+
 def write_blocklist_conf(output_file: str, sources: Dict[str, Any]) -> None:
     """
     Write the blocklist configuration file.
@@ -345,29 +361,35 @@ def main():
     try:
         rethinkdns_data = load_json_file("blocklists_rethinkdns.json")
         sources["RethinkDNS"] = process_rethinkdns_data(rethinkdns_data)
-        log_message("Loaded blocklists_rethinkdns.json")
+        log_message("Loaded RethinkDNS data")
     except Exception as e:
         log_message(f"Error loading RethinkDNS data: {str(e)}")
     
-    # 2. The Firebog (Curated lists)
-    try:
-        firebog_data = load_json_file("blocklists_firebog.json")
-        processed_firebog = process_firebog_data(firebog_data)
-        if processed_firebog["categories"]:  # Only add if we have v.firebog.net URLs
-            sources["The Firebog"] = processed_firebog
-            log_message("Loaded and filtered blocklists_firebog.json")
-    except Exception as e:
-        log_message(f"Error loading Firebog data: {str(e)}")
-    
-    # 3. ShadowWhisperer (Additional lists)
+    # 2. ShadowWhisperer (Comprehensive categorized lists)
     try:
         shadowwhisperer_data = load_json_file("blocklists_shadowwhisperer.json")
         sources["ShadowWhisperer"] = process_shadowwhisperer_data(shadowwhisperer_data)
-        log_message("Loaded blocklists_shadowwhisperer.json")
+        log_message("Loaded ShadowWhisperer data")
     except Exception as e:
         log_message(f"Error loading ShadowWhisperer data: {str(e)}")
     
-    # 4. Frogeye (Specialized tracking lists)
+    # 3. NextDNS (Recommended blocklists)
+    try:
+        nextdns_data = load_json_file("blocklists_nextdns.json")
+        sources["NextDNS"] = process_nextdns_data(nextdns_data)
+        log_message("Loaded NextDNS data")
+    except Exception as e:
+        log_message(f"Error loading NextDNS data: {str(e)}")
+    
+    # 4. yokoffing (Curated annoyance and privacy lists)
+    try:
+        yokoffing_data = load_json_file("blocklists_yokoffing.json")
+        sources["yokoffing"] = yokoffing_data  # Already in correct format
+        log_message("Loaded blocklists_yokoffing.json")
+    except Exception as e:
+        log_message(f"Error loading yokoffing data: {str(e)}")
+    
+    # 5. Frogeye (Specialized tracking lists)
     try:
         frogeye_data = load_json_file("blocklists_frogeye.json")
         sources["Geoffrey Frogeye"] = frogeye_data  # Already in correct format
@@ -375,8 +397,18 @@ def main():
     except Exception as e:
         log_message(f"Error loading Frogeye data: {str(e)}")
     
+    # 6. The Firebog (Additional curated lists)
+    try:
+        firebog_data = load_json_file("blocklists_firebog.json")
+        if "categories" in firebog_data:
+            sources["The Firebog"] = firebog_data
+            log_message("Loaded The Firebog data")
+    except Exception as e:
+        log_message(f"Error loading The Firebog data: {str(e)}")
+    
     # Generate configuration file
     write_blocklist_conf("domains-blocklist.conf", sources)
+    log_message("Generated domains-blocklist.conf")
 
 if __name__ == "__main__":
     main() 
