@@ -285,3 +285,5 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - [ShadowWhisperer's BlockLists](https://github.com/ShadowWhisperer/BlockLists) - Additional blocklist source
 - [The Firebog](https://firebog.net/) - Curated collection of blocklists 
 - [Geoffrey Frogeye](https://hostfiles.frogeye.fr/) - Source of first-party tracker blocklists 
+
+<div align='center'>21 March 2024</div> 
