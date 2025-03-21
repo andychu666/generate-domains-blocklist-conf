@@ -2,31 +2,45 @@
 
 This project generates a comprehensive domains blocklist configuration for DNSCrypt-Proxy by combining multiple high-quality sources.
 
-## Sources (in priority order)
+## Sources
 
-1. **RethinkDNS** - Primary source with extensive categorization
+1. **RethinkDNS**
+   - Primary source with extensive categorization
    - Categories: ParentalControl, Security, Privacy
+   - Regular updates and well-maintained lists
    - Source: https://rethinkdns.com/configure
 
-2. **ShadowWhisperer** - Comprehensive categorized lists
+2. **ShadowWhisperer**
+   - Comprehensive categorized lists
    - Categories: Privacy, ParentalControl, Security
+   - Community-maintained
    - Source: https://github.com/ShadowWhisperer/BlockLists
 
-3. **NextDNS** - Recommended blocklists
+3. **NextDNS**
+   - Recommended blocklists
    - Curated selection of high-quality blocklists
+   - Regular updates
    - Source: https://github.com/nextdns/blocklists
 
-4. **yokoffing** - Curated annoyance and privacy lists
+4. **yokoffing**
+   - Curated annoyance and privacy lists
    - Categories: Annoyances, Privacy
    - Source: https://github.com/yokoffing/filterlists
 
-5. **Geoffrey Frogeye** - Specialized tracking protection lists
+5. **Geoffrey Frogeye**
+   - Specialized tracking protection lists
    - First-party and Multi-party trackers
+   - Detailed categorization of trackers
    - Source: https://hostfiles.frogeye.fr/
 
-6. **The Firebog** - Additional curated lists (v.firebog.net only)
+6. **The Firebog**
+   - Additional curated lists (v.firebog.net only)
    - Categories: Suspicious, Advertising, Tracking & Telemetry, Malicious
+   - Carefully curated and reliable
+   - Focused on specific threats
    - Source: https://v.firebog.net/
+
+**Note**: This project is not affiliated with or endorsed by any of the above sources. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
 
 ## Usage
 
@@ -109,34 +123,6 @@ uv pip install playwright
 ```bash
 playwright install chromium
 ```
-
-## Data Sources
-
-This tool fetches blocklist configurations in a specific order to ensure reliability:
-
-1. RethinkDNS Configure Page (Primary Source)
-   - https://rethinkdns.com/configure
-   - Comprehensive categorization
-   - Regular updates
-   - Well-maintained lists
-
-2. The Firebog Curated Lists
-   - https://v.firebog.net/
-   - Only uses lists hosted directly at v.firebog.net
-   - Carefully curated and reliable
-   - Focused on specific threats
-
-3. ShadowWhisperer's BlockLists
-   - https://github.com/ShadowWhisperer/BlockLists
-   - Additional specialized lists
-   - Community-maintained
-
-4. Geoffrey Frogeye's First-party Trackers
-   - https://hostfiles.frogeye.fr/
-   - Specialized tracking protection
-   - Detailed categorization of trackers
-
-**Note**: This project is not affiliated with or endorsed by RethinkDNS, ShadowWhisperer, The Firebog, or Geoffrey Frogeye. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
 
 ## Categories
 
