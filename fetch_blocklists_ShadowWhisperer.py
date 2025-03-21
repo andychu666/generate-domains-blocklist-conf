@@ -3,33 +3,34 @@ from playwright.async_api import async_playwright
 import json
 import re
 
-CATEGORIES = {
-    'Ads': 'Privacy',
-    'Adult': 'ParentalControl',
-    'Apple': 'Privacy',
-    'Bloat': 'Privacy',
-    'Chat': 'ParentalControl',
-    'Cryptocurrency': 'Security',
-    'Dating': 'ParentalControl',
-    'Dynamic': 'Security',
-    'Fonts': 'Privacy',
-    'Free': 'Security',
-    'Gambling': 'ParentalControl',
-    'Junk': 'Security',
-    'Malware': 'Security',
-    'Marketing': 'Privacy',
-    'Marketing-Email': 'Privacy',
-    'Microsoft': 'Privacy',
-    'Remote': 'Security',
-    'Risk': 'Security',
-    'Scam': 'Security',
-    'Shock': 'ParentalControl',
-    'Top_Level': 'Security',
-    'Tracking': 'Privacy',
-    'Tunnels': 'Security',
-    'Typo': 'Security',
-    'UrlShortener': 'Security'
-}
+CATEGORIES = [
+    'Ads',              # Advertisements, Banners, Widgets & Push Notifications
+    'Adult',            # Porn / 18+ Content
+    'Apple',            # Bloat
+    'Bloat',            # Domains not required for software to function
+    'Chat',             # Chat Dialog Popups
+    'Cryptocurrency',   # Bitcoin, Ethereum, Mining, etc. (Not Malware)
+    'Dating',           # Dating Sites
+    'DNS',              # DNS Resolvers
+    'Dynamic',          # Dynamic DNS
+    'Fonts',            # Fonts
+    'Free',             # Free/Cheap Hosting, Free Blogs
+    'Gambling',         # Casino, Gambling, Poker sites
+    'Junk',             # Personally untrusted software, browser extensions, search engines, etc
+    'Malware',          # Malicious Sites, PUPs, Malware, Browser Hijackers, Phishing Sites
+    'Marketing',        # Marketing, Ebay Listing Tools, etc
+    'Marketing-Email',  # Email Based Marketing
+    'Microsoft',        # Apps, Bing, Bloat, Tiles, etc
+    'Remote',           # Domains used for remote sessions
+    'Risk',             # Bad ISP/Bots/Spam, Keyloggers, Sites used by compromised devices
+    'Scam',             # Fake freight, gift cards, products, support, pets, firearms, news, etc
+    'Shock',            # Gore, Gross, and Torture sites
+    'Top_Level',        # Top Level Domains. Sorted by continent, then by country
+    'Tracking',         # Analytics, Diagnostics, Location, Metrics, Public IP
+    'Tunnels',          # VPNs & Proxies
+    'Typo',             # Misspelling of websites / Typosquatting
+    'URL Shortener'     # URL Shorteners. Can be used to mask malicious domains
+]
 
 async def main():
     print("Starting to fetch ShadowWhisperer's BlockLists...")
@@ -47,7 +48,7 @@ async def main():
         blocklist_data = []
         
         # Process each category
-        for category, main_category in CATEGORIES.items():
+        for category in CATEGORIES:
             print(f"Fetching {category} blocklist...")
             url = f'https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Lists/{category}'
             
@@ -67,7 +68,6 @@ async def main():
                     blocklist_data.append({
                         'name': category,
                         'url': url,
-                        'category': main_category,
                         'entries': str(len(domains))
                     })
                     print(f"Found {len(domains)} domains in {category}")
@@ -76,35 +76,29 @@ async def main():
         
         print(f"\nFound {len(blocklist_data)} blocklist categories")
         
-        # Organize by category
-        categories = {}
+        # Organize blocklists
+        categories = {"ShadowWhisperer": []}
         for item in blocklist_data:
-            category = item['category']
-            if category not in categories:
-                categories[category] = []
-            
             list_info = {
                 'name': item['name'],
                 'url': item['url'],
                 'entries': item['entries']
             }
-            categories[category].append(list_info)
-            print(f"Added {item['name']} to {category}")
+            categories["ShadowWhisperer"].append(list_info)
+            print(f"Added {item['name']}")
 
         # Generate markdown content
         markdown_content = "# ShadowWhisperer BlockLists\n\n"
-        markdown_content += "This document contains blocklists from ShadowWhisperer's repository, organized by category.\n\n"
+        markdown_content += "This document contains blocklists from ShadowWhisperer's repository.\n\n"
         
-        for category, lists in categories.items():
-            markdown_content += f"## {category}\n\n"
-            for blocklist in lists:
-                name = blocklist['name']
-                entries = f"{blocklist['entries']} total entries" if blocklist['entries'] else ""
-                
-                markdown_content += f"### {name}\n"
-                if entries:
-                    markdown_content += f"- Entries: {entries}\n"
-                markdown_content += f"- URL: {blocklist['url']}\n\n"
+        for blocklist in categories["ShadowWhisperer"]:
+            name = blocklist['name']
+            entries = f"{blocklist['entries']} total entries" if blocklist['entries'] else ""
+            
+            markdown_content += f"## {name}\n"
+            if entries:
+                markdown_content += f"- Entries: {entries}\n"
+            markdown_content += f"- URL: {blocklist['url']}\n\n"
 
         # Save to markdown file
         with open('blocklists_shadowwhisperer.md', 'w', encoding='utf-8') as f:

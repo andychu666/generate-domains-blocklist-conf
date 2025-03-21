@@ -133,31 +133,33 @@ def process_shadowwhisperer_data(data: Dict[str, Any]) -> Dict[str, Any]:
             
         result = {"categories": {}}
         
-        for category, items in data.items():
-            if not isinstance(items, list):
+        # Get the blocklists array
+        blocklists = data.get("ShadowWhisperer", [])
+        if not isinstance(blocklists, list):
+            raise ValueError("ShadowWhisperer data must contain a list of blocklists")
+        
+        # Create a single category containing all blocklists
+        processed_blocklists = []
+        for item in blocklists:
+            if not isinstance(item, dict):
                 continue
                 
-            processed_blocklists = []
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
-                    
-                try:
-                    processed_blocklists.append({
-                        "name": str(item["name"]),
-                        "url": str(item["url"]),
-                        "entries": int(item.get("entries", 0)),
-                        "source": "ShadowWhisperer"
-                    })
-                except (KeyError, ValueError) as e:
-                    log_message(f"Warning: Invalid blocklist entry in {category}: {e}")
-                    continue
-            
-            if processed_blocklists:
-                result["categories"][category] = {
-                    "description": f"Blocklists from ShadowWhisperer's {category} category",
-                    "blocklists": processed_blocklists
-                }
+            try:
+                processed_blocklists.append({
+                    "name": str(item["name"]),
+                    "url": str(item["url"]),
+                    "entries": int(item.get("entries", 0)),
+                    "source": "ShadowWhisperer"
+                })
+            except (KeyError, ValueError) as e:
+                log_message(f"Warning: Invalid blocklist entry: {e}")
+                continue
+        
+        if processed_blocklists:
+            result["categories"]["ShadowWhisperer"] = {
+                "description": "Comprehensive collection of categorized blocklists",
+                "blocklists": processed_blocklists
+            }
         
         return result
         
