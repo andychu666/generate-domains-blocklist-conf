@@ -311,7 +311,8 @@ def write_blocklist_conf(output_file: str, sources: Dict[str, Any]) -> None:
                 if source_name == "RethinkDNS":
                     f.write("# Source: https://rethinkdns.com/configure\n\n")
                 elif source_name == "ShadowWhisperer":
-                    f.write("# Source: https://github.com/ShadowWhisperer/BlockLists\n\n")
+                    f.write("# Source: https://github.com/ShadowWhisperer/BlockLists\n")
+                    f.write("# Note: Direct categorized blocklists from ShadowWhisperer\n\n")
                 elif source_name == "The Firebog":
                     f.write("# Source: https://v.firebog.net/\n")
                     f.write("# Note: Only using curated lists hosted directly at v.firebog.net\n\n")
@@ -334,9 +335,43 @@ def write_blocklist_conf(output_file: str, sources: Dict[str, Any]) -> None:
                         if not isinstance(blocklist, dict):
                             continue
                             
-                        # Write blocklist entry
-                        if "name" in blocklist:
-                            f.write(f"# {blocklist['name']}\n")
+                        # Write blocklist entry with description from CATEGORIES comments
+                        if source_name == "ShadowWhisperer":
+                            category_desc = {
+                                'Ads': 'Advertisements, Banners, Widgets & Push Notifications',
+                                'Adult': 'Porn / 18+ Content',
+                                'Apple': 'Bloat',
+                                'Bloat': 'Domains not required for software to function',
+                                'Chat': 'Chat Dialog Popups',
+                                'Cryptocurrency': 'Bitcoin, Ethereum, Mining, etc. (Not Malware)',
+                                'Dating': 'Dating Sites',
+                                'DNS': 'DNS Resolvers',
+                                'Dynamic': 'Dynamic DNS',
+                                'Fonts': 'Fonts',
+                                'Free': 'Free/Cheap Hosting, Free Blogs',
+                                'Gambling': 'Casino, Gambling, Poker sites',
+                                'Junk': 'Personally untrusted software, browser extensions, search engines, etc',
+                                'Malware': 'Malicious Sites, PUPs, Malware, Browser Hijackers, Phishing Sites',
+                                'Marketing': 'Marketing, Ebay Listing Tools, etc',
+                                'Marketing-Email': 'Email Based Marketing',
+                                'Microsoft': 'Apps, Bing, Bloat, Tiles, etc',
+                                'Remote': 'Domains used for remote sessions',
+                                'Risk': 'Bad ISP/Bots/Spam, Keyloggers, Sites used by compromised devices',
+                                'Scam': 'Fake freight, gift cards, products, support, pets, firearms, news, etc',
+                                'Shock': 'Gore, Gross, and Torture sites',
+                                'Top_Level': 'Top Level Domains. Sorted by continent, then by country',
+                                'Tracking': 'Analytics, Diagnostics, Location, Metrics, Public IP',
+                                'Tunnels': 'VPNs & Proxies',
+                                'Typo': 'Misspelling of websites / Typosquatting',
+                                'URL Shortener': 'URL Shorteners. Can be used to mask malicious domains'
+                            }
+                            if blocklist["name"] in category_desc:
+                                f.write(f"# {blocklist['name']}: {category_desc[blocklist['name']]}\n")
+                            else:
+                                f.write(f"# {blocklist['name']}\n")
+                        else:
+                            if "name" in blocklist:
+                                f.write(f"# {blocklist['name']}\n")
                         if "sub_category" in blocklist and blocklist["sub_category"]:
                             f.write(f"# Category: {blocklist['sub_category']}\n")
                         if "entries" in blocklist and blocklist["entries"] > 0:
