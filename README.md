@@ -196,24 +196,29 @@ The tool organizes blocklists from different sources into their respective categ
 - Ads: Advertisements, Banners, Widgets & Push Notifications
 - Adult: Porn / 18+ Content
 - Apple: Bloat
-- Bloat: Fonts, Surveys, Domains not required for software to function
+- Bloat: Domains not required for software to function
 - Chat: Chat Dialog Popups
-- Cryptocurrency: Bitcoin, Ethereum, Mining, etc. (Not malware, but could be used by it)
+- Cryptocurrency: Bitcoin, Ethereum, Mining, etc. (Not Malware)
 - Dating: Dating Sites
-- Dynamic: Dynamic DNS (DNS → IP)
+- DNS: DNS Resolvers
+- Dynamic: Dynamic DNS
+- Fonts: Fonts
 - Free: Free/Cheap Hosting, Free Blogs
 - Gambling: Casino, Gambling, Poker sites
-- Junk: Personally Untrusted Antivirus, Browser Extensions, Search Engines, etc.
+- Junk: Personally untrusted software, browser extensions, search engines, etc
 - Malware: Malicious Sites, PUPs, Malware, Browser Hijackers, Phishing Sites
-- Marketing: Marketing, Ebay Listing Tools, etc.
-- Microsoft: Apps, Bing, Bloat, Tiles, etc.
+- Marketing: Marketing, Ebay Listing Tools, etc
+- Marketing-Email: Email Based Marketing
+- Microsoft: Apps, Bing, Bloat, Tiles, etc
 - Remote: Domains used for remote sessions
 - Risk: Bad ISP/Bots/Spam, Keyloggers, Sites used by compromised devices
-- Scam: Fake freight, gift cards, products, support, pet sales, firearms, news, etc.
+- Scam: Fake freight, gift cards, products, support, pets, firearms, news, etc
 - Shock: Gore, Gross, and Torture sites
+- Top_Level: Top Level Domains. Sorted by continent, then by country
 - Tracking: Analytics, Diagnostics, Location, Metrics, Public IP
 - Tunnels: VPNs & Proxies
-- URL Shortener: URL Shorteners (Can be used to mask malicious domains)
+- Typo: Misspelling of websites / Typosquatting
+- URL Shortener: URL Shorteners. Can be used to mask malicious domains
 
 ### Geoffrey Frogeye Categories (Specialized)
 
