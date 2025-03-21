@@ -1,17 +1,18 @@
 # DNSCrypt-Proxy Blocklist Generator
 
-A utility to generate DNSCrypt-Proxy compatible domain blocklists using categorized data from multiple sources:
-- RethinkDNS's public configuration
-- ShadowWhisperer's BlockLists
-- The Firebog's curated blocklists
-- Geoffrey Frogeye's First-party Trackers
+A utility to generate DNSCrypt-Proxy compatible domain blocklists using categorized data from multiple sources in a prioritized order:
+1. RethinkDNS's public configuration (Primary source)
+2. The Firebog's curated v.firebog.net lists
+3. ShadowWhisperer's BlockLists (Additional lists)
+4. Geoffrey Frogeye's First-party Trackers (Specialized tracking lists)
 
 ## Overview
 
 This tool helps you create organized blocklist configurations for DNSCrypt-Proxy by:
-1. Fetching categorized blocklist data from multiple sources
+1. Fetching categorized blocklist data from multiple trusted sources
 2. Converting the data into DNSCrypt-Proxy's blocklist format
-3. Generating organized configuration files for different categories (Privacy, Security, ParentalControl)
+3. Generating organized configuration files with clear section markers
+4. Prioritizing reliable and well-maintained blocklists
 
 ## Prerequisites
 
@@ -32,7 +33,6 @@ cd generate-domains-blocklist-conf
 # Using Python 3.13
 uv venv .venv -p 3.13
 
-
 # Activate the environment
 .\.venv\Scripts\activate  # Windows
 source .venv/bin/activate  # Linux/macOS
@@ -50,11 +50,29 @@ playwright install chromium
 
 ## Data Sources
 
-This tool fetches blocklist configurations from:
-1. RethinkDNS Configure Page (https://rethinkdns.com/configure)
-2. ShadowWhisperer's BlockLists (https://github.com/ShadowWhisperer/BlockLists)
-3. The Firebog's Curated Lists (https://firebog.net/)
-4. Geoffrey Frogeye's First-party Trackers (https://hostfiles.frogeye.fr/)
+This tool fetches blocklist configurations in a specific order to ensure reliability:
+
+1. RethinkDNS Configure Page (Primary Source)
+   - https://rethinkdns.com/configure
+   - Comprehensive categorization
+   - Regular updates
+   - Well-maintained lists
+
+2. The Firebog Curated Lists
+   - https://v.firebog.net/
+   - Only uses lists hosted directly at v.firebog.net
+   - Carefully curated and reliable
+   - Focused on specific threats
+
+3. ShadowWhisperer's BlockLists
+   - https://github.com/ShadowWhisperer/BlockLists
+   - Additional specialized lists
+   - Community-maintained
+
+4. Geoffrey Frogeye's First-party Trackers
+   - https://hostfiles.frogeye.fr/
+   - Specialized tracking protection
+   - Detailed categorization of trackers
 
 **Note**: This project is not affiliated with or endorsed by RethinkDNS, ShadowWhisperer, The Firebog, or Geoffrey Frogeye. It simply converts their publicly available blocklist configurations into DNSCrypt-Proxy compatible format.
 
@@ -62,7 +80,7 @@ This tool fetches blocklist configurations from:
 
 The tool organizes blocklists from different sources into their respective categories:
 
-### RethinkDNS Categories
+### RethinkDNS Categories (Primary)
 
 #### Parental Controls
 - Adult content
@@ -95,7 +113,37 @@ The tool organizes blocklists from different sources into their respective categ
 - Google telemetry
 - Smart TV telemetry
 
-### ShadowWhisperer Categories
+### The Firebog Categories (Curated v.firebog.net Lists)
+
+#### Suspicious
+- Domains with suspicious behavior
+- Potential threats
+- Spam sources
+- Blacklisted domains
+
+#### Advertising
+- Advertisement networks
+- Tracking domains
+- Ad servers
+- Marketing platforms
+
+#### Tracking & Telemetry
+- User tracking endpoints
+- Data collection services
+- Analytics platforms
+- Telemetry servers
+
+#### Malicious
+- Known malware domains
+- Phishing sites
+- Scam domains
+- Cryptojacking
+
+#### Other
+- Additional curated lists
+- Special purpose blocklists
+
+### ShadowWhisperer Categories (Additional)
 
 - Ads: Advertisements, Banners, Widgets & Push Notifications
 - Adult: Porn / 18+ Content
@@ -119,44 +167,7 @@ The tool organizes blocklists from different sources into their respective categ
 - Tunnels: VPNs & Proxies
 - URL Shortener: URL Shorteners (Can be used to mask malicious domains)
 
-### The Firebog Categories
-
-#### Suspicious
-- KADhosts
-- Spammers
-- Blacklists
-- Referrer Spam
-- Other suspicious domains
-
-#### Advertising
-- AdAway
-- Adguard DNS
-- Anti-Adblock
-- Easylist
-- Peter Lowe's Adservers
-- Other ad domains
-
-#### Tracking & Telemetry
-- Easyprivacy
-- Windows Spyware
-- Smart TV tracking
-- Multi-party trackers
-- Analytics domains
-
-#### Malicious
-- Cryptojacking
-- Malware domains
-- Phishing Army
-- Ransomware
-- Scam domains
-- Stalkerware
-
-#### Other
-- Adult content
-- Facebook
-- Custom filters
-
-### Geoffrey Frogeye Categories
+### Geoffrey Frogeye Categories (Specialized)
 
 #### First-party Trackers
 - Contains every hostname redirecting to a hand-picked list of first-party trackers
@@ -183,11 +194,18 @@ The tool organizes blocklists from different sources into their respective categ
 
 The tool generates several output files:
 
+### Configuration File
+- `domains-blocklist.conf`: The main DNSCrypt-Proxy configuration file
+  - Clear section markers for each source
+  - Organized by priority and category
+  - Includes entry counts and descriptions
+  - Local additions support
+
 ### Markdown Files
-- `blocklists_rethinkdns.md`: RethinkDNS blocklists organized by category
-- `blocklists_shadowwhisperer.md`: ShadowWhisperer blocklists organized by category
-- `blocklists_firebog.md`: The Firebog's curated blocklists organized by category
-- `blocklists_frogeye.md`: Geoffrey Frogeye's tracker blocklists organized by category
+- `blocklists_rethinkdns.md`: Primary source blocklists
+- `blocklists_firebog.md`: Curated v.firebog.net lists
+- `blocklists_shadowwhisperer.md`: Additional specialized lists
+- `blocklists_frogeye.md`: Tracking protection lists
 
 Each markdown file includes:
 - Category and subcategory
@@ -202,20 +220,6 @@ Each markdown file includes:
 - `blocklists_frogeye.json`
 
 Structured JSON files containing the same data as the markdown files, useful for programmatic processing or integration with other tools.
-
-### `domains-blocklist.conf`
-The configuration file that lists URLs of blocklist sources for DNSCrypt-Proxy's `generate-domains-blocklist.py` utility. This file:
-- Lists URLs of blocklist sources, one per line
-- Supports file:// URLs for local additions
-- Allows commenting out sources with # to disable them
-- Follows DNSCrypt-Proxy's standard configuration format
-- Used by `generate-domains-blocklist.py` to create an optimized and deduplicated domain blocklist
-
-The generated configuration can be used with DNSCrypt-Proxy's `generate-domains-blocklist.py` to create a final blocklist that:
-- Removes duplicates across all sources
-- Handles overlapping patterns
-- Respects the allowlist (domains-allowlist.txt)
-- Supports time-restricted blocks
 
 ### Debug Screenshots
 - `debug_screenshot_rethinkdns.png`

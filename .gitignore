@@ -19,6 +19,7 @@ __pycache__/
 *.log 
 
 # Generated files
+debug_screenshots/
 debug_screenshot_*.png
 blocklists_*.md
 blocklists_*.json

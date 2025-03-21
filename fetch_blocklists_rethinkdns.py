@@ -1,9 +1,53 @@
+#!/usr/bin/env python3
+"""
+Fetch and process RethinkDNS blocklists.
+
+This script fetches various blocklists from RethinkDNS (https://rethinkdns.com/configure),
+processes them, and saves the results in both markdown and JSON formats.
+
+The script scrapes the website to get:
+1. Categories of blocklists (Privacy, Security, ParentalControl)
+2. Names and URLs of blocklists in each category
+3. Entry counts and subcategories where available
+
+Output files:
+- blocklists_rethinkdns.md: Human-readable markdown format
+- blocklists_rethinkdns.json: Machine-readable JSON format with standardized keys
+- debug_screenshots/: Directory containing debug information
+"""
+
 import asyncio
 from playwright.async_api import async_playwright
 import json
 import re
+from pathlib import Path
+import datetime
+
+async def save_debug_info(page, name: str) -> None:
+    """
+    Save debug information including page screenshot and HTML content.
+    
+    Args:
+        page: Playwright page object
+        name: Name of the section being debugged
+    """
+    debug_dir = Path("debug_screenshots")
+    debug_dir.mkdir(exist_ok=True)
+    
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    # Save screenshot
+    screenshot_file = debug_dir / f"rethinkdns_{name.lower().replace(' ', '_')}_{timestamp}.png"
+    await page.screenshot(path=str(screenshot_file))
+    
+    # Save HTML content
+    html_file = debug_dir / f"rethinkdns_{name.lower().replace(' ', '_')}_{timestamp}.html"
+    content = await page.content()
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(content)
 
 async def main():
+    """Main function to fetch and process RethinkDNS blocklists."""
     print("Starting to fetch RethinkDNS blocklists...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -20,9 +64,11 @@ async def main():
         await page.goto('https://rethinkdns.com/configure')
         
         print("Waiting for content to load...")
-        # Wait for specific elements to appear
         await page.wait_for_selector('.bl-item', timeout=30000)
         await page.wait_for_selector('.bl-item__url', timeout=30000)
+        
+        # Save initial debug info
+        await save_debug_info(page, "main_page")
         
         # Scroll through the page to ensure all content is loaded
         for _ in range(3):
@@ -31,13 +77,12 @@ async def main():
         
         # Get all blocklist items
         print("Collecting blocklist data...")
-        blocklist_data = await page.evaluate('''
+        raw_data = await page.evaluate('''
         () => {
             const results = [];
             const items = document.querySelectorAll('.bl-item');
             
             items.forEach(item => {
-                // Get the parent section to determine category
                 let category = '';
                 let parent = item;
                 while (parent && !category) {
@@ -61,7 +106,7 @@ async def main():
                         name: nameElem.textContent.trim(),
                         url: urlElem.href,
                         category: category,
-                        entries: entriesMatch ? entriesMatch[1] : ''
+                        entries: entriesMatch ? parseInt(entriesMatch[1]) : 0
                     });
                 }
             });
@@ -69,22 +114,18 @@ async def main():
         }
         ''')
         
-        print(f"Found {len(blocklist_data)} blocklist items")
+        print(f"Found {len(raw_data)} blocklist items")
         
-        # Print first few items for debugging
-        for i, item in enumerate(blocklist_data[:3]):
-            print(f"\nItem {i}:")
-            print(f"Name: {item['name']}")
-            print(f"URL: {item['url']}")
-            print(f"Category: {item['category']}")
-            print(f"Entries: {item['entries']}")
-
-        # Organize by category
-        categories = {}
-        for item in blocklist_data:
+        # Convert to standardized format
+        blocklist_data = {"categories": {}}
+        
+        for item in raw_data:
             category = item['category'] or 'Uncategorized'
-            if category not in categories:
-                categories[category] = []
+            if category not in blocklist_data["categories"]:
+                blocklist_data["categories"][category] = {
+                    "description": f"Blocklists from RethinkDNS's {category} category",
+                    "blocklists": []
+                }
             
             name = item['name']
             sub_category = ''
@@ -95,30 +136,33 @@ async def main():
                 name = name_match.group(1).strip()
                 sub_category = name_match.group(2).strip()
             
-            list_info = {
-                'name': name,
-                'sub_category': sub_category,
-                'url': item['url'],
-                'entries': item['entries']
+            blocklist_info = {
+                "name": name,
+                "url": item['url'],
+                "entries": item['entries'],
+                "source": "RethinkDNS",
+                "sub_category": sub_category
             }
-            categories[category].append(list_info)
-            print(f"Added {name} to {category}")
+            blocklist_data["categories"][category]["blocklists"].append(blocklist_info)
 
         # Generate markdown content
+        print("Saving blocklists to markdown...")
         markdown_content = "# RethinkDNS Blocklists\n\n"
-        markdown_content += "This document contains a comprehensive list of blocklists available through RethinkDNS, organized by category.\n\n"
+        markdown_content += "This document contains a comprehensive list of blocklists available through RethinkDNS (https://rethinkdns.com/configure), organized by category.\n\n"
         
-        for category, lists in categories.items():
+        for category, data in blocklist_data["categories"].items():
             markdown_content += f"## {category}\n\n"
-            for blocklist in lists:
+            markdown_content += f"{data['description']}\n\n"
+            for blocklist in data["blocklists"]:
                 name = blocklist['name']
                 sub_cat = f" ({blocklist['sub_category']})" if blocklist['sub_category'] else ""
-                entries = f"{blocklist['entries']} total entries" if blocklist['entries'] else ""
                 
                 markdown_content += f"### {name}{sub_cat}\n"
-                if entries:
-                    markdown_content += f"- Entries: {entries}\n"
-                markdown_content += f"- URL: {blocklist['url']}\n\n"
+                markdown_content += f"- Source: {blocklist['source']}\n"
+                markdown_content += f"- URL: {blocklist['url']}\n"
+                if blocklist["entries"] > 0:
+                    markdown_content += f"- Entries: {blocklist['entries']}\n"
+                markdown_content += "\n"
 
         # Save to markdown file
         with open('blocklists_rethinkdns.md', 'w', encoding='utf-8') as f:
@@ -127,11 +171,8 @@ async def main():
 
         # Save to JSON file
         with open('blocklists_rethinkdns.json', 'w', encoding='utf-8') as f:
-            json.dump(categories, f, indent=2, ensure_ascii=False)
+            json.dump(blocklist_data, f, indent=2, ensure_ascii=False)
         print("Successfully saved blocklists to blocklists_rethinkdns.json")
-        
-        await page.screenshot(path='debug_screenshot_rethinkdns.png')
-        print("Saved debug screenshot to debug_screenshot_rethinkdns.png")
         
         await browser.close()
 

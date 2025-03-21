@@ -1,10 +1,125 @@
+#!/usr/bin/env python3
+"""
+Fetch and process The Firebog's blocklists.
+
+This script fetches various blocklists from The Firebog (https://v.firebog.net/),
+processes them, and saves the results in both markdown and JSON formats.
+
+The script scrapes the website to get:
+1. Categories of blocklists
+2. Names and URLs of blocklists in each category
+3. Additional metadata where available
+
+Output files:
+- blocklists_firebog.md: Human-readable markdown format
+- blocklists_firebog.json: Machine-readable JSON format with standardized keys
+- debug_screenshots/: Directory containing debug information
+"""
+
 import asyncio
 from playwright.async_api import async_playwright
 import json
 import re
+from pathlib import Path
+import datetime
+import sys
+from typing import Dict, Any, List
+import os
+
+def log_message(message: str) -> None:
+    """Print a message to stderr for immediate output."""
+    print(message, file=sys.stderr)
+
+async def save_debug_info(page, name: str) -> None:
+    """
+    Save debug information including page screenshot and HTML content.
+    
+    Args:
+        page: Playwright page object
+        name: Name of the section being debugged
+    """
+    debug_dir = Path("debug_screenshots")
+    debug_dir.mkdir(exist_ok=True)
+    
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    log_message(f"Saving debug info for {name}...")
+    
+    # Save screenshot
+    screenshot_file = debug_dir / f"firebog_{name.lower().replace(' ', '_')}_{timestamp}.png"
+    await page.screenshot(path=str(screenshot_file))
+    log_message(f"  - Screenshot saved to {screenshot_file}")
+    
+    # Save HTML content
+    html_file = debug_dir / f"firebog_{name.lower().replace(' ', '_')}_{timestamp}.html"
+    content = await page.content()
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(content)
+    log_message(f"  - HTML content saved to {html_file}")
+
+async def scrape_blocklists(page) -> Dict[str, List[Dict[str, str]]]:
+    """
+    Scrape blocklist data from the page.
+    
+    Args:
+        page: Playwright page object
+        
+    Returns:
+        Dictionary mapping categories to lists of blocklist information
+    """
+    log_message("Scraping blocklist data...")
+    raw_data = await page.evaluate('''
+    () => {
+        const results = {};
+        const sections = document.querySelectorAll('h2');
+        
+        sections.forEach(section => {
+            const sectionName = section.textContent.trim();
+            if (sectionName.includes('Lists')) {
+                const category = sectionName.replace(' Lists', '');
+                results[category] = [];
+                
+                let ul = section.nextElementSibling;
+                while (ul && ul.tagName !== 'UL') {
+                    ul = ul.nextElementSibling;
+                }
+                
+                if (ul) {
+                    const links = ul.querySelectorAll('a');
+                    links.forEach(link => {
+                        const name = link.textContent.trim();
+                        const url = link.href;
+                        if (url && !url.includes('javascript:') && 
+                            (url.includes('raw.githubusercontent.com') || 
+                             url.includes('v.firebog.net') ||
+                             url.includes('hosts.txt') ||
+                             url.includes('list.txt') ||
+                             url.includes('blocklist.txt') ||
+                             url.endsWith('.txt'))) {
+                            results[category].push({
+                                name: name,
+                                url: url
+                            });
+                        }
+                    });
+                }
+            }
+        });
+        return results;
+    }
+    ''')
+    
+    total_lists = sum(len(items) for items in raw_data.values())
+    log_message(f"Found {len(raw_data)} categories with {total_lists} total blocklists")
+    for category, items in raw_data.items():
+        log_message(f"  - {category}: {len(items)} blocklists")
+    
+    return raw_data
 
 async def main():
-    print("Starting to fetch Firebog blocklists...")
+    """Main function to fetch and process The Firebog's blocklists."""
+    log_message("\n=== Starting Firebog Blocklist Fetcher ===\n")
+    log_message("Initializing browser...")
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=False,
@@ -16,83 +131,69 @@ async def main():
         )
         page = await context.new_page()
         
-        print("Navigating to Firebog page...")
+        log_message("\nNavigating to Firebog page...")
         await page.goto('https://v.firebog.net/')
         
-        print("Waiting for content to load...")
-        await page.wait_for_selector('h2', timeout=30000)  # Wait for section headers
+        log_message("Waiting for content to load...")
+        await page.wait_for_selector('h2', timeout=30000)
+        log_message("Page loaded successfully")
+        
+        # Save initial debug info
+        await save_debug_info(page, "main_page")
         
         # Get all sections and their blocklists
-        print("Collecting blocklist data...")
-        blocklist_data = await page.evaluate('''
-        () => {
-            const results = {};
-            const sections = document.querySelectorAll('h2');
-            
-            sections.forEach(section => {
-                const sectionName = section.textContent.trim();
-                if (sectionName.includes('Lists')) {
-                    const category = sectionName.replace(' Lists', '');
-                    results[category] = [];
-                    
-                    // Find the next ul element after this section header
-                    let ul = section.nextElementSibling;
-                    while (ul && ul.tagName !== 'UL') {
-                        ul = ul.nextElementSibling;
-                    }
-                    
-                    if (ul) {
-                        const links = ul.querySelectorAll('a');
-                        links.forEach(link => {
-                            const name = link.textContent.trim();
-                            const url = link.href;
-                            // Only include raw URLs that can be used as blocklists
-                            if (url && !url.includes('javascript:') && 
-                                (url.includes('raw.githubusercontent.com') || 
-                                 url.includes('v.firebog.net') ||
-                                 url.includes('hosts.txt') ||
-                                 url.includes('list.txt') ||
-                                 url.includes('blocklist.txt') ||
-                                 url.endsWith('.txt'))) {
-                                results[category].push({
-                                    name: name,
-                                    url: url
-                                });
-                            }
-                        });
-                    }
-                }
-            });
-            return results;
-        }
-        ''')
+        raw_data = await scrape_blocklists(page)
         
-        print(f"Found blocklists in {len(blocklist_data)} categories")
+        log_message("\nProcessing blocklist data...")
+        # Convert to standardized format
+        blocklist_data = {
+            "categories": {
+                category: {
+                    "description": f"Blocklists from The Firebog's {category} category",
+                    "blocklists": [
+                        {
+                            "name": item["name"],
+                            "url": item["url"],
+                            "entries": 0,
+                            "source": "The Firebog"
+                        }
+                        for item in items
+                    ]
+                }
+                for category, items in raw_data.items()
+            }
+        }
         
         # Generate markdown content
-        markdown_content = "# Firebog Blocklists\n\n"
-        markdown_content += "This document contains a comprehensive list of blocklists available through Firebog (https://v.firebog.net/), organized by category.\n\n"
+        log_message("\nGenerating markdown content...")
+        markdown_content = "# The Firebog Blocklists\n\n"
+        markdown_content += "This document contains a comprehensive list of blocklists available through The Firebog (https://v.firebog.net/), organized by category.\n\n"
         
-        for category, lists in blocklist_data.items():
+        for category, data in blocklist_data["categories"].items():
+            log_message(f"  - Processing {category} category")
             markdown_content += f"## {category}\n\n"
-            for blocklist in lists:
+            markdown_content += f"{data['description']}\n\n"
+            for blocklist in data["blocklists"]:
                 markdown_content += f"### {blocklist['name']}\n"
-                markdown_content += f"- URL: {blocklist['url']}\n\n"
+                markdown_content += f"- Source: {blocklist['source']}\n"
+                markdown_content += f"- URL: {blocklist['url']}\n"
+                if blocklist["entries"] > 0:
+                    markdown_content += f"- Entries: {blocklist['entries']}\n"
+                markdown_content += "\n"
 
         # Save to markdown file
+        log_message("\nSaving output files...")
         with open('blocklists_firebog.md', 'w', encoding='utf-8') as f:
             f.write(markdown_content)
-        print("Successfully saved blocklists to blocklists_firebog.md")
+        log_message("  ✓ Saved markdown to blocklists_firebog.md")
 
         # Save to JSON file
         with open('blocklists_firebog.json', 'w', encoding='utf-8') as f:
             json.dump(blocklist_data, f, indent=2, ensure_ascii=False)
-        print("Successfully saved blocklists to blocklists_firebog.json")
-        
-        await page.screenshot(path='debug_screenshot_firebog.png')
-        print("Saved debug screenshot to debug_screenshot_firebog.png")
+        log_message("  ✓ Saved JSON to blocklists_firebog.json")
         
         await browser.close()
+        log_message("\n=== Firebog Blocklist Fetcher Completed ===\n")
 
 if __name__ == "__main__":
     asyncio.run(main()) 
