@@ -1,0 +1,33 @@
+# Virtual Environment
+.venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+
+# Backup files
+*.bak
+*~
+
+# Logs
+*.log 
+
+# Generated files
+debug_screenshots/
+debug_screenshot_*.png
+blocklists_*.md
+blocklists_*.json
+domains-blocklist.conf
+
+# Generated domain lists
+generate-domains-blocklist/*.txt
+
+# Keep README
+!README.md
+# Generated files\ndebug_screenshot_*.png\nblocklists_*.md\nblocklists_*.json\ndomains-blocklist.conf\n\n# Keep README\n!README.md
